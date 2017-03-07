@@ -3,6 +3,7 @@
 #define PI 3.14159265
 
 uniform vec2 resolution;
+uniform mat4 view;
 
 const vec3 xDir = vec3(1, 0, 0);
 const vec3 yDir = vec3(0, 1, 0);
@@ -11,10 +12,9 @@ const vec3 zDir = vec3(0, 0, 1);
 out vec4 color;
 
 const float MinimumDistance = 0.0001;
-const float MaximumRaySteps = 600;
+const int MaximumRaySteps = 400;
 const int Iterations = 100;
-const float Power = 7;
-
+const float Power = 8;
 
 float DE(vec3 pos) {
 	vec3 z = pos;
@@ -22,7 +22,7 @@ float DE(vec3 pos) {
 	float r = 0.0;
 	for (int i = 0; i < Iterations ; i++) {
 		r = length(z);
-		if (r>100) break;
+		if (r>1.999f) break;
 		
 		// convert to polar coordinates
 		float theta = acos(z.z/r);
@@ -50,7 +50,6 @@ float trace(vec3 from, vec3 direction) {
 		totalDistance += distance;
 		if (distance < MinimumDistance) break;
 	}
-	//return (direction.x / 2 + 0.5);
 	return 1.0f-(float(steps) / float(MaximumRaySteps));
 }
 
@@ -61,16 +60,30 @@ vec3 get_normal(vec3 pos)
 		DE(pos+zDir)-DE(pos-zDir))));
 }
 
+vec3 get_pos()
+{
+	vec4 tmpcamPos;
+
+	tmpcamPos.x = -view[0][3];
+	tmpcamPos.y = -view[1][3];
+	tmpcamPos.z = -view[2][3];
+	tmpcamPos.w = 0;
+	tmpcamPos *= inverse(view);
+	return -tmpcamPos.xyz;	
+}
+
 void main(void)
 {
-	vec3 from = vec3(0, 0, -2);
+	vec3 from = get_pos();
 	vec3 direction;
-	vec2 screenPos = vec2(gl_FragCoord.x/resolution.x - 0.5, gl_FragCoord.y / resolution.y - 0.5);
 	vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
 
 	p.x *= resolution.x/resolution.y;
-	direction=normalize(vec3(p.x * 1.4,p.y,1.0));
+	direction=normalize(vec3(p.x,p.y, 1));
+	direction = normalize((vec4(direction.xyz, 0) * view).xyz);
 	float a = trace(from, direction);
-	color = vec4(vec3(1, 1, 1) * a, 0.2);
+	color = vec4(vec3(1 - a, a / 2, a) * a, 1);
+	if (a == 0)
+		discard ;
 //	color = vec4(1, 1, 1, 0);
 }

@@ -168,7 +168,7 @@ void			renderBuiltIn::update()
 		renderBuiltIn::render(camera);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
-	render_fractal();
+	render_fractal(get_camera(_cameras[0]));
 	numCamera = 0;
 	sizeList = 0;
 	_numLight = 0;

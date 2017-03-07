@@ -115,7 +115,7 @@ private :
 	static void						create_onScreenRendering_data();
 	static void						renderOnScreen();
 
-	static void						render_fractal();
+	static void						render_fractal(t_camera *camera);
 
 };
 
