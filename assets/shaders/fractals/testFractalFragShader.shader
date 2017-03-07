@@ -1,17 +1,18 @@
 #version 400
 
-float PI=3.14159265;
+#define PI 3.14159265
 
 uniform vec2 resolution;
 
+const vec3 xDir = vec3(1, 0, 0);
+const vec3 yDir = vec3(0, 1, 0);
+const vec3 zDir = vec3(0, 0, 1);
 
 out vec4 color;
 
-
-const float MinimumDistance = 0.00000001;
-const float MaximumRaySteps = 60;
-const int Iterations = 3;
-const float Scale = 1;
+const float MinimumDistance = 0.0001;
+const float MaximumRaySteps = 600;
+const int Iterations = 100;
 const float Power = 7;
 
 
@@ -40,22 +41,6 @@ float DE(vec3 pos) {
 	return 0.5*log(r)*r/dr;
 }
 
-/*
-float DE(vec3 z)
-{
-    float r;
-    int n = 0;
-    while (n < Iterations) {
-       if(z.x+z.y<0) z.xy = -z.yx; // fold 1
-       if(z.x+z.z<0) z.xz = -z.zx; // fold 2
-       if(z.y+z.z<0) z.zy = -z.yz; // fold 3	
-       z = z*Scale - 1*(Scale-1.0);
-       n++;
-    }
-    return (length(z) ) * pow(Scale, -float(n));
-}
-*/
-
 float trace(vec3 from, vec3 direction) {
 	float totalDistance = 0.0;
 	int steps;
@@ -69,16 +54,11 @@ float trace(vec3 from, vec3 direction) {
 	return 1.0f-(float(steps) / float(MaximumRaySteps));
 }
 
-void FishEyeCamera(vec2 screenPos, float ratio, float fovy, out vec3 direction )
+vec3 get_normal(vec3 pos)
 {
-    screenPos.y -= 0.2;
-    screenPos *= vec2(PI*0.5,PI*0.5/ratio)/fovy;
-
-    direction = vec3(
-           sin(screenPos.y+PI*0.5)*sin(screenPos.x)
-        , -cos(screenPos.y+PI*0.5)
-        , sin(screenPos.y+PI*0.5)*cos(screenPos.x)
-    );
+	return (normalize(vec3(DE(pos+xDir)-DE(pos-xDir),
+		DE(pos+yDir)-DE(pos-yDir),
+		DE(pos+zDir)-DE(pos-zDir))));
 }
 
 void main(void)
