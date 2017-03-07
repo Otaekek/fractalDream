@@ -8,11 +8,11 @@ uniform vec2 resolution;
 out vec4 color;
 
 
-const float MinimumDistance = 0.01;
+const float MinimumDistance = 0.00000001;
 const float MaximumRaySteps = 60;
 const int Iterations = 3;
-const float Scale = 2;
-const float Power = 5;
+const float Scale = 1;
+const float Power = 7;
 
 
 float DE(vec3 pos) {
@@ -66,7 +66,7 @@ float trace(vec3 from, vec3 direction) {
 		if (distance < MinimumDistance) break;
 	}
 	//return (direction.x / 2 + 0.5);
-	return 1-float(steps) / float(MaximumRaySteps);
+	return 1.0f-(float(steps) / float(MaximumRaySteps));
 }
 
 void FishEyeCamera(vec2 screenPos, float ratio, float fovy, out vec3 direction )
@@ -91,6 +91,6 @@ void main(void)
 	p.x *= resolution.x/resolution.y;
 	direction=normalize(vec3(p.x * 1.4,p.y,1.0));
 	float a = trace(from, direction);
-	color = vec4(vec3(1, 1, 1), a);
+	color = vec4(vec3(1, 1, 1) * a, 0.2);
 //	color = vec4(1, 1, 1, 0);
 }
