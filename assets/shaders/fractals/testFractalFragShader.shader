@@ -11,9 +11,9 @@ const vec3 zDir = vec3(0, 0, 1);
 
 out vec4 color;
 
-const float MinimumDistance = 0.0001;
+const float MinimumDistance = 0.00001;
 const int MaximumRaySteps = 400;
-const int Iterations = 100;
+const int Iterations = 1000;
 const float Power = 8;
 
 float DE(vec3 pos) {
@@ -82,7 +82,7 @@ void main(void)
 	direction=normalize(vec3(p.x,p.y, 1));
 	direction = normalize((vec4(direction.xyz, 0) * view).xyz);
 	float a = trace(from, direction);
-	color = vec4(vec3(1 - a, a / 2, a) * a, 1);
+	color = vec4(vec3(1  * a, a / 2, a * 2) * a, 1);
 	if (a == 0)
 		discard ;
 //	color = vec4(1, 1, 1, 0);
