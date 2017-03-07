@@ -1,0 +1,17 @@
+newmtl front
+map_Kd front.png
+
+newmtl back
+map_Kd back.png
+
+newmtl top
+map_Kd top.png
+
+newmtl right
+map_Kd right.png
+
+newmtl left
+map_Kd left.png
+
+newmtl bottom
+map_Kd bottom.png
