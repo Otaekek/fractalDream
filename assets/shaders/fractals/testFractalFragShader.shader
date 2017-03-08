@@ -8,10 +8,10 @@ uniform float time;
 
 out vec4 color;
 
-const float MinimumDistance = 0.0001;
-const int MaximumRaySteps = 100;
+const float MinimumDistance = 0.01;
+const int MaximumRaySteps = 40;
 const int Iterations = 10;
-const float Power = 8;
+float Power = mod(time / 50000, 7.0f) + 2.0f;
 
 
 const vec3 xDir = vec3(MinimumDistance, 0, 0);
@@ -109,7 +109,7 @@ void main(void)
 	float a = trace(from, direction, oc);
 
 	normal = get_normal(from + direction * a);
-	color.xyz = vec3(0.4, 0.8, 0.3) * max(dot(normal, vec3(0, 1, 0)), 0) * oc;// * (abs(s) * 5);
+	color.xyz = vec3(Power / 10, Power * Power / 200, 0.8) * max(dot(normal, vec3(0, 1, 0)), 0) / oc;// * (abs(s) * 5);
 	//color = vec4(normal.x, normal.y, normal.z, a);
 	color.w = 1;
 	if (a == 0)
