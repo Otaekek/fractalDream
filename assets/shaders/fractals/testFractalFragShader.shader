@@ -6,26 +6,28 @@ uniform vec2 resolution;
 uniform mat4 view;
 uniform float time;
 
-const vec3 xDir = vec3(1, 0, 0);
-const vec3 yDir = vec3(0, 1, 0);
-const vec3 zDir = vec3(0, 0, 1);
-
 out vec4 color;
 
-const float MinimumDistance = 0.001;
+const float MinimumDistance = 0.0001;
 const int MaximumRaySteps = 100;
-const int Iterations = 50;
-float tmp = mod(time / 50000, 6.0f) + 2;
-float Power = tmp;
-float k = mod(time / 100000, 1.0f) / 2;
+const int Iterations = 10;
+const float Power = 8;
+
+
+const vec3 xDir = vec3(MinimumDistance, 0, 0);
+const vec3 yDir = vec3(0, MinimumDistance, 0);
+const vec3 zDir = vec3(0, 0, MinimumDistance);
+
+float s;
 
 float DE(vec3 pos) {
 	vec3 z = pos;
 	float dr = 1.0;
 	float r = 0.0;
-	for (int i = 0; i < Iterations ; i++) {
+	int i = 0;
+	for (i; i < Iterations ; i++) {
 		r = length(z);
-		if (r>1.999f) break;
+		if (r>1.999f) break ;
 		
 		// convert to polar coordinates
 		float theta = acos(z.z/r);
@@ -41,10 +43,18 @@ float DE(vec3 pos) {
 		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
 		z+=pos;
 	}
+
+
+	s = float(i) / Iterations;/* 
+	+ log(log(r))/log(1) 
+	- log(log(dot(z,z)))/log(1);
+*/
+
 	return 0.5*log(r)*r/dr;
 }
 
-float trace(vec3 from, vec3 direction) {
+
+float trace(vec3 from, vec3 direction, out float oc) {
 	float totalDistance = 0.0;
 	int steps;
 	for (steps=0; steps < MaximumRaySteps; steps++) {
@@ -53,7 +63,9 @@ float trace(vec3 from, vec3 direction) {
 		totalDistance += distance;
 		if (distance < MinimumDistance) break;
 	}
-	return 1.0f-(float(steps) / float(MaximumRaySteps));
+	oc =  1.0f-(float(steps) / float(MaximumRaySteps));
+	return (totalDistance);
+	//return 1.0f-(float(steps) / float(MaximumRaySteps));
 }
 
 vec3 get_normal(vec3 pos)
@@ -84,18 +96,22 @@ vec3 get_pos()
 void main(void)
 {
 	vec3 from = get_pos();
+	vec3 normal;
+	float oc;
+
 	from.x  = -from.x;
 	vec3 direction;
 	vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
-	if (tmp > 5.0f)
-		Power = 10.0f - tmp;
-
 	p.x *= resolution.x/resolution.y;
 	direction = normalize(vec3(p.x,p.y, 1));
 		direction = get_dir(direction);
 	//direction = normalize((vec4(direction.xyz, 0) * view).xyz);
-	float a = trace(from, direction);
-	color = vec4(vec3((1 - k + 0.5), k + k, k) * a * a * a * a * a* a, a);
+	float a = trace(from, direction, oc);
+
+	normal = get_normal(from + direction * a);
+	color.xyz = vec3(0.4, 0.8, 0.3) * max(dot(normal, vec3(0, 1, 0)), 0) * oc;// * (abs(s) * 5);
+	//color = vec4(normal.x, normal.y, normal.z, a);
+	color.w = 1;
 	if (a == 0)
 		discard ;
 //	color = vec4(1, 1, 1, 0);
