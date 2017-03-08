@@ -1,17 +1,17 @@
 newmtl front
-map_Kd front.png
+map_Kd nightFront.png
 
 newmtl back
-map_Kd back.png
+map_Kd nightBack.png
 
 newmtl top
-map_Kd top.png
+map_Kd nightTop.png
 
 newmtl right
-map_Kd right.png
+map_Kd nightRight.png
 
 newmtl left
-map_Kd left.png
+map_Kd nightLeft.png
 
 newmtl bottom
-map_Kd bottom.png
+map_Kd nightBottom.png

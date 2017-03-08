@@ -111,8 +111,8 @@ void main(void)
 	normal = get_normal(from + direction * a);
 	color.xyz = vec3(Power / 10, Power * Power / 200, 0.8) * max(dot(normal, vec3(0, 1, 0)), 0) / oc;// * (abs(s) * 5);
 	//color = vec4(normal.x, normal.y, normal.z, a);
-	color.w = 1;
-	if (a == 0)
+	color.w = mod(oc, 1);
+	if (a >  100)
 		discard ;
 //	color = vec4(1, 1, 1, 0);
 }

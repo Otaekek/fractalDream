@@ -3,7 +3,7 @@
 #
 
 o cube
-mtllib cube.mtl
+mtllib cube1.mtl
 
 v -0.500000 -0.500000 0.500000
 v 0.500000 -0.500000 0.500000
