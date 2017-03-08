@@ -11,7 +11,7 @@ out vec4 color;
 const float MinimumDistance = 0.01;
 const int MaximumRaySteps = 40;
 const int Iterations = 10;
-float Power = mod(time / 50000, 7.0f) + 2.0f;
+float Power = mod(time / 50000, 7.0f) + 1.0f;
 
 
 const vec3 xDir = vec3(MinimumDistance, 0, 0);
