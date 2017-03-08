@@ -4,6 +4,7 @@
 
 uniform vec2 resolution;
 uniform mat4 view;
+uniform float time;
 
 const vec3 xDir = vec3(1, 0, 0);
 const vec3 yDir = vec3(0, 1, 0);
@@ -11,10 +12,12 @@ const vec3 zDir = vec3(0, 0, 1);
 
 out vec4 color;
 
-const float MinimumDistance = 0.00001;
-const int MaximumRaySteps = 400;
-const int Iterations = 1000;
-const float Power = 8;
+const float MinimumDistance = 0.001;
+const int MaximumRaySteps = 100;
+const int Iterations = 50;
+float tmp = mod(time / 50000, 6.0f) + 2;
+float Power = tmp;
+float k = mod(time / 100000, 1.0f) / 2;
 
 float DE(vec3 pos) {
 	vec3 z = pos;
@@ -60,29 +63,39 @@ vec3 get_normal(vec3 pos)
 		DE(pos+zDir)-DE(pos-zDir))));
 }
 
+vec3 get_dir(vec3 dir)
+{
+	return (vec4(dir.xyz, 0) * view).xyz;
+}
+
 vec3 get_pos()
 {
-	vec4 tmpcamPos;
-
+	vec4 tmpcamPos = vec4(0, 0, 0, 1);
+	return (tmpcamPos * view).xyz;
+//	return (tmpcamPos *view).xyz;
 	tmpcamPos.x = -view[0][3];
 	tmpcamPos.y = -view[1][3];
 	tmpcamPos.z = -view[2][3];
-	tmpcamPos.w = 0;
-	tmpcamPos *= inverse(view);
-	return -tmpcamPos.xyz;	
+	tmpcamPos.w = 1;
+//	tmpcamPos *= inverse(view);
+	return tmpcamPos.xyz;	
 }
 
 void main(void)
 {
 	vec3 from = get_pos();
+	from.x  = -from.x;
 	vec3 direction;
 	vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
+	if (tmp > 5.0f)
+		Power = 10.0f - tmp;
 
 	p.x *= resolution.x/resolution.y;
-	direction=normalize(vec3(p.x,p.y, 1));
-	direction = normalize((vec4(direction.xyz, 0) * view).xyz);
+	direction = normalize(vec3(p.x,p.y, 1));
+		direction = get_dir(direction);
+	//direction = normalize((vec4(direction.xyz, 0) * view).xyz);
 	float a = trace(from, direction);
-	color = vec4(vec3(1  * a, a / 2, a * 2) * a, 1);
+	color = vec4(vec3((1 - k + 0.5), k + k, k) * a * a * a * a * a* a, a);
 	if (a == 0)
 		discard ;
 //	color = vec4(1, 1, 1, 0);
