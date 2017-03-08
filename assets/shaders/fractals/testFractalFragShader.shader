@@ -8,10 +8,11 @@ uniform float time;
 
 out vec4 color;
 
-const float MinimumDistance = 0.01;
-const int MaximumRaySteps = 40;
+const float MinimumDistance = 0.005;
+const int MaximumRaySteps = 100;
 const int Iterations = 10;
-float Power = mod(time / 50000, 7.0f) + 1.0f;
+float Power;
+float tmp = mod(time / 50000, 16.0f);
 
 
 const vec3 xDir = vec3(MinimumDistance, 0, 0);
@@ -99,6 +100,10 @@ void main(void)
 	vec3 normal;
 	float oc;
 
+	Power = tmp;
+	if (Power > 8)
+		Power = 16.0f - tmp;
+	Power += 2;
 	from.x  = -from.x;
 	vec3 direction;
 	vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
@@ -109,7 +114,8 @@ void main(void)
 	float a = trace(from, direction, oc);
 
 	normal = get_normal(from + direction * a);
-	color.xyz = vec3(Power / 10, Power * Power / 200, 0.8) * max(dot(normal, vec3(0, 1, 0)), 0) / oc;// * (abs(s) * 5);
+	oc = mod(oc, 10);
+	color.xyz = vec3(Power / 10, Power * Power / 200, 0.4) * max(dot(normal, vec3(0, 1, 0)), 0) / oc;// * (abs(s) * 5);
 	//color = vec4(normal.x, normal.y, normal.z, a);
 	color.w = mod(oc, 1);
 	if (a >  100)
